@@ -9,6 +9,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
       
     </script>
+     <script>
+        // Verificar se o usuário está logado
+        const isLoggedIn = localStorage.getItem("isLoggedIn");
+
+        // Se não estiver logado, redireciona para a página de login
+        if (!isLoggedIn) {
+            window.location.href = "https://matheusfonsecabjj.github.io/login/"; // Redireciona para o login
+        }
+
+        // Função para fazer logout
+        function logout() {
+            localStorage.clear(); // Limpa os dados do usuário
+            window.location.href = "https://matheusfonsecabjj.github.io/login/"; // Redireciona para o login
+        }
+    </script>
     <style>
         * {
             margin: 0;
