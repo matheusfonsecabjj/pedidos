@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Pedidos</title>
+    <link rel="stylesheet" type="text/css" href="pagina.css" media="screen" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+      
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        .min-h-screen {
+            min-height: 100vh;
+            background-color: #ffffff;
+        }
+
+        header {
+            background-color: #ffffff;
+            color: white;
+            padding: 1.5rem;
+        }
+
+        .header-content {
+            max-width: 80rem;
+            margin: 0 auto;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        main {
+            max-width: 80rem;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-primary:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 0.5rem 0.5rem 0.5rem 2rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 0.5rem center;
+            background-size: 1rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f9fafb;
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            white-space: nowrap;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tr.used {
+            background-color: #f3f4f6;
+        }
+
+        .checkbox {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 0.25rem;
+            border: 1px solid #d1d5db;
+            cursor: pointer;
+        }
+
+        .checkbox:disabled {
+            background-color: #e5e7eb;
+            cursor: not-allowed;
+        }
+
+        .total-row {
+            background-color: #f9fafb;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">
+            <img src="logo.png" alt="Logo"> <!-- Substitua 'sua-imagem.png' pelo caminho da sua imagem -->
+        </div>
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="menu">
+            <a href="https://matheusfonsecabjj.github.io/home/">Home</a>
+            <a href="https://matheusfonsecabjj.github.io/entrada/">Entrada</a>
+            <a href="https://matheusfonsecabjj.github.io/saida/">Saída</a>
+            <a href="https://matheusfonsecabjj.github.io/lista/">Listagem</a>
+            <a href="https://matheusfonsecabjj.github.io/mapa/">Mapeamento</a>
+            <a href="https://matheusfonsecabjj.github.io/pedidos/">Espelho</a>
+            <a href="#" onclick="logout()">Logout</a> <!-- Botão de logout -->
+        </div>
+    </nav>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('nav .menu');
+            menu.classList.toggle('active');
+        }
+    </script>
+    
+    <div class="min-h-screen">
+        <header>
+            <div class="header-content">
+                <h1 class="header-title">Sistema de Pedidos</h1>
+            </div>
+        </header>
+
+        <main>
+            <div class="card">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Nome do Cliente</label>
+                        <input type="text" id="nome" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Código</label>
+                        <input type="text" id="codigo" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Pedido</label>
+                        <input type="text" id="pedido" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Remessa</label>
+                        <input type="text" id="remessa" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Data</label>
+                        <input type="date" id="data" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Situação</label>
+                        <input type="text" id="situacao" class="form-input">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Observações</label>
+                    <textarea id="observacoes" class="form-input" rows="4"></textarea>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-header">
+                    <h2 class="table-title">Lista de Produtos</h2>
+                    <button id="generatePDF" class="btn btn-primary" disabled>Gerar PDF</button>
+                </div>
+
+                <div class="filters-grid">
+                    <input type="text" class="filter-input" data-filter="codigo" placeholder="Filtrar código">
+                    <input type="text" class="filter-input" data-filter="produto" placeholder="Filtrar produto">
+                    <input type="text" class="filter-input" data-filter="cor" placeholder="Filtrar cor">
+                    <input type="text" class="filter-input" data-filter="espessura" placeholder="Filtrar espessura">
+                    <input type="text" class="filter-input" data-filter="peso" placeholder="Filtrar peso">
+                    <input type="text" class="filter-input" data-filter="placas" placeholder="Filtrar placas">
+                </div>
+
+                <div class="table-container">
+                    <table id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>Selecionar</th>
+                                <th>Código</th>
+                                <th>Produto</th>
+                                <th>Cor</th>
+                                <th>Espessura</th>
+                                <th>Peso</th>
+                                <th>Placas</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Carregar produtos do localStorage e adicionar a propriedade 'usado'
+        function loadProducts() {
+            const storedProducts = JSON.parse(localStorage.getItem('produtos')) || [];
+            // Adicionar a propriedade 'usado' se não existir
+            return storedProducts.map(product => ({
+                ...product,
+                usado: product.usado || false
+            }));
+        }
+
+        // Salvar produtos no localStorage
+        function saveProducts(products) {
+            localStorage.setItem('produtos', JSON.stringify(products));
+        }
+
+        // Inicializar produtos do localStorage
+        let products = loadProducts();
+        let selectedProducts = [];
+
+        // Inicializar data com a data atual
+        document.getElementById('data').valueAsDate = new Date();
+
+        // Função para atualizar a tabela
+        function updateTable() {
+            const tbody = document.querySelector('#productsTable tbody');
+            tbody.innerHTML = '';
+
+            const filters = Array.from(document.querySelectorAll('.filter-input')).reduce((acc, input) => {
+                acc[input.dataset.filter] = input.value.toLowerCase();
+                return acc;
+            }, {});
+
+            const availableProducts = products.filter(product => {
+                if (product.usado) return false;
+                
+                return Object.entries(filters).every(([key, value]) => {
+                    return String(product[key]).toLowerCase().includes(value);
+                });
+            });
+
+            availableProducts.forEach(product => {
+                const tr = document.createElement('tr');
+                tr.className = product.usado ? 'used' : '';
+                
+                tr.innerHTML = `
+                    <td>
+                        <input type="checkbox" class="checkbox" 
+                            ${product.usado ? 'disabled' : ''} 
+                            ${selectedProducts.includes(product.codigo) ? 'checked' : ''}
+                            data-codigo="${product.codigo}">
+                    </td>
+                    <td>${product.codigo}</td>
+                    <td>${product.produto}</td>
+                    <td>${product.cor}</td>
+                    <td>${product.espessura}</td>
+                    <td>${product.peso}</td>
+                    <td>${product.placas}</td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+
+            // Atualizar estado do botão PDF
+            document.getElementById('generatePDF').disabled = selectedProducts.length === 0;
+        }
+
+        // Event listeners para filtros
+        document.querySelectorAll('.filter-input').forEach(input => {
+            input.addEventListener('input', updateTable);
+        });
+
+        // Event listener para seleção de produtos
+        document.querySelector('#productsTable').addEventListener('change', (e) => {
+            if (e.target.matches('.checkbox')) {
+                const codigo = e.target.dataset.codigo;
+                
+                if (e.target.checked) {
+                    selectedProducts.push(codigo);
+                } else {
+                    selectedProducts = selectedProducts.filter(c => c !== codigo);
+                }
+                
+                updateTable();
+            }
+        });
+
+        // Função para gerar PDF
+        document.getElementById('generatePDF').addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Marcar produtos como usados e salvar no localStorage
+            products = products.map(product => ({
+                ...product,
+                usado: selectedProducts.includes(product.codigo) ? true : product.usado
+            }));
+            saveProducts(products);
+
+            // Cabeçalho
+            doc.setFillColor(220, 220, 220);
+            doc.rect(20, 20, 170, 10, 'F');
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.text('ESPELHO DE PEDIDOS', 105, 27, { align: 'center' });
+
+            // Informações do pedido
+            doc.setDrawColor(180, 180, 180);
+            doc.setFillColor(250, 250, 250);
+            
+            // Primeira linha
+            doc.rect(20, 35, 85, 12);
+            doc.rect(105, 35, 85, 12);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Número do Pedido:', 23, 42);
+            doc.text('Data:', 108, 42);
+            doc.setFont('helvetica', 'normal');
+            doc.text(document.getElementById('pedido').value || '-', 65, 42);
+            doc.text(document.getElementById('data').value || '-', 125, 42);
+
+            // Segunda linha
+            doc.rect(20, 47, 85, 12);
+            doc.rect(105, 47, 85, 12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Cliente:', 23, 54);
+            doc.text('Código:', 108, 54);
+            doc.setFont('helvetica', 'normal');
+            doc.text(document.getElementById('nome').value || '-', 45, 54);
+            doc.text(document.getElementById('codigo').value || '-', 130, 54);
+
+            // Terceira linha
+            doc.rect(20, 59, 85, 12);
+            doc.rect(105, 59, 85, 12);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Remessa:', 23, 66);
+            doc.text('Situação:', 108, 66);
+            doc.setFont('helvetica', 'normal');
+            doc.text(document.getElementById('remessa').value || '-', 50, 66);
+            doc.text(document.getElementById('situacao').value || '-', 130, 66);
+
+            // Preparar dados dos produtos com agrupamento
+            const selectedProductsData = products.filter(p => selectedProducts.includes(p.codigo));
+            
+            // Criar grupos para produtos correspondentes
+            const groups = selectedProductsData.reduce((acc, product) => {
+                const key = `${product.produto}-${product.cor}-${product.espessura}`;
+                if (!acc[key]) {
+                    acc[key] = {
+                        produto: product.produto,
+                        cor: product.cor,
+                        espessura: product.espessura,
+                        pesoTotal: 0,
+                        placasTotal: 0,
+                        items: []
+                    };
+                }
+                acc[key].items.push(product);
+                acc[key].pesoTotal += parseFloat(product.peso);
+                acc[key].placasTotal += parseFloat(product.placas);
+                return acc;
+            }, {});
+
+            // Preparar dados da tabela com totais
+            const tableData = [];
+            Object.values(groups).forEach(group => {
+                // Adicionar itens individuais
+                group.items.forEach(item => {
+                    tableData.push([
+                        item.codigo,
+                        item.produto,
+                        item.cor,
+                        item.espessura,
+                        item.peso,
+                        item.placas
+                    ]);
+                });
+
+                // Se houver mais de um item no grupo, adicionar linha de total
+                if (group.items.length > 1) {
+                    tableData.push([
+                        { content: 'TOTAL', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } },
+                        { content: group.pesoTotal.toString(), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } },
+                        { content: group.placasTotal.toString(), styles: { fontStyle: 'bold', fillColor: [240, 240, 240] } }
+                    ]);
+                }
+            });
+
+            // Gerar tabela
+            doc.autoTable({
+                head: [['Código', 'Produto', 'Cor', 'Espessura', 'Peso', 'Placas']],
+                body: tableData,
+                startY: 80,
+                theme: 'grid',
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 3,
+                    lineColor: [180, 180, 180],
+                    lineWidth: 0.5,
+                },
+                headStyles: {
+                    fillColor: [240, 240, 240],
+                    textColor: [0, 0, 0],
+                    fontSize: 9,
+                    fontStyle: 'bold',
+                    halign: 'center',
+                },
+                columnStyles: {
+                    0: { cellWidth: 25, halign: 'center' },
+                    1: { cellWidth: 50 },
+                    2: { cellWidth: 25, halign: 'center' },
+                    3: { cellWidth: 25, halign: 'center' },
+                    4: { cellWidth: 25, halign: 'center' },
+                    5: { cellWidth: 25, halign: 'center' }
+                },
+            });
+
+            // Seção de observações
+            const observacoes = document.getElementById('observacoes').value;
+            if (observacoes) {
+                const finalY = doc.lastAutoTable.finalY + 10;
+                doc.setFillColor(240, 240, 240);
+                doc.rect(20, finalY, 170, 8, 'F');
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.text('OBSERVAÇÕES', 25, finalY + 6);
+                
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                const splitText = doc.splitTextToSize(observacoes, 160);
+                doc.rect(20, finalY + 8, 170, splitText.length * 7 + 4);
+                doc.text(splitText, 25, finalY + 14);
+            }
+
+            // Rodapé com linhas de assinatura
+            const pageHeight = doc.internal.pageSize.height;
+            doc.setFontSize(10);
+            
+            // Linhas de assinatura
+            const signatureY = pageHeight - 40;
+            doc.line(30, signatureY, 90, signatureY);
+            doc.line(110, signatureY, 170, signatureY);
+            doc.setFontSize(8);
+            doc.text('Responsável pelo Pedido', 40, signatureY + 5);
+            doc.text('Aprovação', 130, signatureY + 5);
+
+            // Informações de geração
+            doc.setFontSize(8);
+            doc.text('Documento gerado em ' + new Date().toLocaleString(), 105, pageHeight - 10, { align: 'center' });
+
+            // Salvar o PDF
+            const pedido = document.getElementById('pedido').value || 'novo';
+            const data = document.getElementById('data').value || 'sem-data';
+            doc.save(`pedido-${pedido}-${data}.pdf`);
+
+            // Limpar seleção e atualizar tabela
+            selectedProducts = [];
+            updateTable();
+        });
+
+        // Inicializar tabela
+        updateTable();
+    </script>
+</body>
+</html>
