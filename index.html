@@ -211,7 +211,7 @@
 
     <nav>
         <div class="logo">
-            <img src="logo.png" alt="Logo"> <!-- Substitua 'sua-imagem.png' pelo caminho da sua imagem -->
+            <img src="logo.png" alt="Logo">
         </div>
         <div class="menu-toggle" onclick="toggleMenu()">
             <div></div>
@@ -225,7 +225,6 @@
             <a href="https://matheusfonsecabjj.github.io/lista/">Listagem</a>
             <a href="https://matheusfonsecabjj.github.io/mapa/">Mapeamento</a>
             <a href="https://matheusfonsecabjj.github.io/pedidos/">Espelho</a>
-            
         </div>
     </nav>
 
@@ -316,7 +315,6 @@
         // Carregar produtos do localStorage e adicionar a propriedade 'usado'
         function loadProducts() {
             const storedProducts = JSON.parse(localStorage.getItem('produtos')) || [];
-            // Adicionar a propriedade 'usado' se não existir
             return storedProducts.map(product => ({
                 ...product,
                 usado: product.usado || false
@@ -506,6 +504,7 @@
                 body: tableData,
                 startY: 80,
                 theme: 'grid',
+                margin: { left: 30 },
                 styles: {
                     fontSize: 8,
                     cellPadding: 2,
@@ -520,12 +519,12 @@
                     halign: 'center',
                 },
                 columnStyles: {
-                    0: { cellWidth: 20, halign: 'center' },
-                    1: { cellWidth: 40 },
-                    2: { cellWidth: 20, halign: 'center' },
-                    3: { cellWidth: 20, halign: 'center' },
-                    4: { cellWidth: 20, halign: 'center' },
-                    5: { cellWidth: 20, halign: 'center' }
+                    0: { cellWidth: 15, halign: 'center' },
+                    1: { cellWidth: 30 },
+                    2: { cellWidth: 15, halign: 'center' },
+                    3: { cellWidth: 15, halign: 'center' },
+                    4: { cellWidth: 12, halign: 'center' },
+                    5: { cellWidth: 12, halign: 'center' }
                 },
             });
 
