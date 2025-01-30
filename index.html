@@ -507,34 +507,34 @@
             });
 
             // Gerar tabela
-        doc.autoTable({
+       doc.autoTable({
     head: [['Código', 'Produto', 'Cor', 'Espessura', 'Peso', 'Placas']],
     body: tableData,
-    startY: 85, // Reduzindo para ganhar mais espaço
+    startY: 80,
     theme: 'grid',
     styles: {
-        fontSize: 8, // Reduzindo o tamanho da fonte
-        cellPadding: 2, // Reduzindo o espaço interno das células
-        minCellHeight: 5, // Diminuindo a altura mínima da célula
+        fontSize: 8,  // Reduzir o tamanho da fonte
+        cellPadding: 2,  // Diminuir o padding das células
         lineColor: [180, 180, 180],
-        lineWidth: 2, // Reduzindo a largura das bordas para menos espaço
+        lineWidth: 0.5,
     },
     headStyles: {
         fillColor: [240, 240, 240],
         textColor: [0, 0, 0],
-        fontSize: 8,
+        fontSize: 8,  // Reduzir o tamanho da fonte no cabeçalho
         fontStyle: 'bold',
         halign: 'center',
     },
     columnStyles: {
         0: { cellWidth: 20, halign: 'center' },
-        1: { cellWidth: 45 }, // Ajustando colunas para melhor distribuição
+        1: { cellWidth: 45 },
         2: { cellWidth: 20, halign: 'center' },
         3: { cellWidth: 20, halign: 'center' },
         4: { cellWidth: 20, halign: 'center' },
         5: { cellWidth: 20, halign: 'center' }
     },
 });
+
 
             // Seção de observações
             const observacoes = document.getElementById('observacoes').value;
